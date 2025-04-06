@@ -3,10 +3,13 @@ package com.recipedb.api.dao;
 import com.recipedb.api.model.Account;
 import com.recipedb.api.util.DatabaseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class AccountDao implements Dao<Account> {
@@ -26,9 +29,16 @@ public class AccountDao implements Dao<Account> {
             values (:firstName, :lastName, :username, :password, :role, :email)
             """;
 
-    public Account findByUsername(String username) {
-        namedParams = new BeanPropertySqlParameterSource(new Account());
-        return jdbcTemplate.queryForObject(SELECT_BY_USERNAME, namedParams, Account.class);
+    public Optional<Account> findByUsername(String username) {
+        namedParams = new BeanPropertySqlParameterSource(Account.builder().username(username).build());
+
+        try {
+            Account account = jdbcTemplate.queryForObject(SELECT_BY_USERNAME, namedParams,
+                    new BeanPropertyRowMapper<>(Account.class));
+            return Optional.of(account);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     @Override

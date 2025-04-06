@@ -1,9 +1,9 @@
-package com.recipedb.api.model;
+package com.recipedb.api.dto;
 
 import lombok.Data;
 
 @Data
-public class RegistrationDetails {
+public class RegisterDetailsDto {
 
     private String firstName;
     private String lastName;
