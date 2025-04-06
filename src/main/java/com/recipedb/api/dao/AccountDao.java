@@ -2,67 +2,39 @@ package com.recipedb.api.dao;
 
 import com.recipedb.api.model.Account;
 import com.recipedb.api.util.DatabaseUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
-
-@Slf4j
 @Component
 public class AccountDao implements Dao<Account> {
-
-    public static final Logger LOGGER = LoggerFactory.getLogger(AccountDao.class);
 
     @Autowired
     private DatabaseUtil databaseUtil;
 
-    @Override
-    public Optional<Account> get(int id) {
-        return Optional.empty();
-    }
+    @Autowired
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public Optional<Account> findByUsername(String username) {
-        String query = "select * from Account where username = ?";
-        Account account = null;
+    private SqlParameterSource namedParams;
 
-        try (ResultSet rs = databaseUtil.executeQuery(query, List.of(username))) {
-            if (rs.next()) {
-                account = Account.builder()
-                        .id(rs.getInt("id"))
-                        .firstName(rs.getString("firstName"))
-                        .lastName(rs.getString("lastName"))
-                        .username(username)
-                        .password(rs.getString("password"))
-                        .role(rs.getString("role"))
-                        .email(rs.getString("email"))
-                        .description(rs.getString("description")).build();
-            }
+    private static final String SELECT_BY_USERNAME = "select * from Account where username = :username";
 
-        } catch(SQLException e) {
-            LOGGER.error("SQLException: {}", e.getMessage());
-        }
-        return Optional.ofNullable(account);
+    private static final String INSERT_ACCOUNT = """
+            insert into Account(firstName, lastName, username, password, role, email)
+            values (:firstName, :lastName, :username, :password, :role, :email)
+            """;
+
+    public Account findByUsername(String username) {
+        namedParams = new BeanPropertySqlParameterSource(new Account());
+        return jdbcTemplate.queryForObject(SELECT_BY_USERNAME, namedParams, Account.class);
     }
 
     @Override
     public void save(Account account) {
-        String query = """
-                insert into Account(firstName, lastName, username, password, role, email)
-                values (?, ?, ?, ?, ?, ?)
-                """;
-        try  {
-            List<Object> params = List.of(account.getFirstName(), account.getLastName(), account.getUsername(),
-                    account.getPassword(), account.getRole(), account.getEmail());
-            databaseUtil.executeUpdate(query, params);
-        } catch (SQLException e) {
-            LOGGER.error("SQLException: {}", e.getMessage());
-        }
+        namedParams = new BeanPropertySqlParameterSource(account);
+        jdbcTemplate.update(INSERT_ACCOUNT, namedParams);
     }
 
     @Override

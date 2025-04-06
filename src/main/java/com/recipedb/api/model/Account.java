@@ -1,11 +1,12 @@
 package com.recipedb.api.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Account {
 
     @Id

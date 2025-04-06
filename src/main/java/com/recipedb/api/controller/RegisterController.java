@@ -16,6 +16,6 @@ public class RegisterController {
     @PostMapping
     public ResponseEntity<?> registerAccount(@RequestBody RegistrationDetails registrationDetails) {
         accountService.createAccount(registrationDetails);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Account created successfully");
     }
 }
