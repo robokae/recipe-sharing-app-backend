@@ -1,7 +1,6 @@
 package com.recipedb.api.dao;
 
 import com.recipedb.api.model.Account;
-import com.recipedb.api.util.DatabaseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -13,9 +12,6 @@ import java.util.Optional;
 
 @Component
 public class AccountDao implements Dao<Account> {
-
-    @Autowired
-    private DatabaseUtil databaseUtil;
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;

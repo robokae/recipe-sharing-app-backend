@@ -52,7 +52,7 @@ public class JwtTokenUtil {
     }
 
     private boolean isExpired(String token) {
-        return !getClaims(token).getExpiration().before(new Date());
+        return !getClaims(token).getExpiration().after(new Date());
     }
 
 }
