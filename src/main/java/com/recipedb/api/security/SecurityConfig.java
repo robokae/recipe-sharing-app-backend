@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/register").permitAll()
                         .requestMatchers("/api/recipes/**").permitAll()
+                        .requestMatchers("/api/profile/**").permitAll()
                         .anyRequest().authenticated());
         return http.build();
     }

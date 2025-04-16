@@ -17,4 +17,4 @@ security:
   cors:
     allowed-origins: http://localhost:5173
   jwt:
-    expiration-time: 3600000
+    expiration-time: 86400000

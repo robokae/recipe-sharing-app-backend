@@ -8,7 +8,7 @@ public interface Dao<T> {
         return Optional.empty();
     }
 
-    void save(T t);
+    T save(T t);
     void update(T t);
     void delete(T t);
 }

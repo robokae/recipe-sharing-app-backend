@@ -1,13 +1,21 @@
 create table if not exists Account(
     id int not null auto_increment,
-    firstName varchar(255) not null,
-    lastName varchar(255) not null,
     username varchar(32) unique not null,
     password varchar(64) not null,
     role varchar(64) not null default 'USER',
+    primary key (id)
+);
+
+create table if not exists Profile(
+    id int not null auto_increment,
+    accountId int not null,
+    firstName varchar(255) not null,
+    lastName varchar(255) not null,
     email varchar(255) unique not null,
     description varchar(255),
-    primary key (id)
+    createdAt date not null,
+    primary key (id),
+    foreign key (accountId) references Account(id)
 );
 
 create table if not exists FeaturedImage(
