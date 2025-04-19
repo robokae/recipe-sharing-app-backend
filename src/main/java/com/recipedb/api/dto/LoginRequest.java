@@ -3,7 +3,7 @@ package com.recipedb.api.dto;
 import lombok.Getter;
 
 @Getter
-public class LoginDetailsDto {
+public class LoginRequest {
 
     private String username;
     private String password;

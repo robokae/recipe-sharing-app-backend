@@ -2,9 +2,9 @@ package com.recipedb.api.service;
 
 import com.recipedb.api.dao.AccountDao;
 import com.recipedb.api.dao.ProfileDao;
-import com.recipedb.api.exception.UserAlreadyExistException;
+import com.recipedb.api.exception.UsernameAlreadyExistException;
 import com.recipedb.api.model.Account;
-import com.recipedb.api.dto.RegisterDetailsDto;
+import com.recipedb.api.dto.RegisterRequest;
 import com.recipedb.api.model.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,9 +27,9 @@ public class AccountService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public Profile createAccount(RegisterDetailsDto registerDetails) throws UserAlreadyExistException {
+    public Profile createAccount(RegisterRequest registerDetails) {
         accountDao.findByUsername(registerDetails.getUsername()).ifPresent(account -> {
-            throw new UserAlreadyExistException("User already exists");
+            throw new UsernameAlreadyExistException("Account with username already exists");
         });
 
         String encryptedPassword = passwordEncoder.encode(registerDetails.getPassword());

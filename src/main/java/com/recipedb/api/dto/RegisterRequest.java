@@ -3,7 +3,7 @@ package com.recipedb.api.dto;
 import lombok.Data;
 
 @Data
-public class RegisterDetailsDto {
+public class RegisterRequest {
 
     private String firstName;
     private String lastName;

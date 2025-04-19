@@ -19,7 +19,7 @@ public class AccountDetailsService implements UserDetailsService {
     private AccountDao accountDao;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         Account account = accountDao.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return new User(account.getUsername(), account.getPassword(),
