@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,12 +28,18 @@ public class RecipeDao implements Dao<Recipe> {
                 :numServings, :ingredients, :instructions)
             """;
 
-    private static final String SELECT_RECIPES_BY_ACCOUNT_ID = "select * from Recipe where accountId = :accountId";
+    private static final String SELECT_RECIPES_BY_ACCOUNT_ID = """
+            select r.title, r.accountId, r.createdAt, r.description, r.completionTimeInMinutes, r.numServings,
+                r.ingredients, r.instructions"
+            from Recipe as r, Account as a
+            where r.accountId = a.id and a.username = :username
+            """;
 
     private static final String SELECT_ALL_RECIPES = "select * from Recipe";
 
     public List<Recipe> getAllByUsername(String username) {
-        namedParams = new BeanPropertySqlParameterSource(Account.builder().username(username).build());
+        Account account = Account.builder().username(username).build();
+        namedParams = new BeanPropertySqlParameterSource(account);
         return jdbcTemplate.query(SELECT_RECIPES_BY_ACCOUNT_ID, namedParams, new BeanPropertyRowMapper<>(Recipe.class));
     }
 
@@ -40,9 +48,12 @@ public class RecipeDao implements Dao<Recipe> {
     }
 
     @Override
-    public void save(Recipe recipe) {
+    public Recipe save(Recipe recipe) {
         namedParams = new BeanPropertySqlParameterSource(recipe);
-        jdbcTemplate.update(INSERT_RECIPE, namedParams);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(INSERT_RECIPE, namedParams, keyHolder);
+        recipe.setId(keyHolder.getKey().intValue());
+        return recipe;
     }
 
     @Override

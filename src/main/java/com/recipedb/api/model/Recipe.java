@@ -14,13 +14,13 @@ public class Recipe {
     @Id
     private int id;
     private String title;
-    private Integer accountId;
+    private int accountId;
     private Integer featuredImageId;
     private Date createdAt;
     private String description;
     private Double rating;
-    private double completionTimeInMinutes;
-    private double numServings;
+    private Double completionTimeInMinutes;
+    private Double numServings;
     private String ingredients;
     private String instructions;
 }
