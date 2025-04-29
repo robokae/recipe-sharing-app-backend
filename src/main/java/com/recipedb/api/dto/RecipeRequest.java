@@ -1,9 +1,10 @@
 package com.recipedb.api.dto;
 
+import lombok.Data;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
-@Getter
+@Data
 public class RecipeRequest {
 
     private String title;

@@ -1,6 +1,7 @@
 package com.recipedb.api.service;
 
 import com.recipedb.api.dao.ProfileDao;
+import com.recipedb.api.dto.ProfileResponse;
 import com.recipedb.api.model.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,8 +12,12 @@ public class ProfileService {
     @Autowired
     private ProfileDao profileDao;
 
-    public Profile getByUsername(String username) {
-        return profileDao.findByAccountId(username);
+    public ProfileResponse getByUsername(String username) {
+        Profile profile = profileDao.findByAccountId(username);
+        return ProfileResponse.builder()
+                .username(username).firstName(profile.getFirstName()).lastName(profile.getLastName())
+                .email(profile.getEmail()).description(profile.getDescription()).createdAt(profile.getCreatedAt())
+                .build();
     }
 
     public Profile createProfile(Profile profile) {

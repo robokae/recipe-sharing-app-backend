@@ -28,7 +28,7 @@ public class ProfileDao implements Dao<Profile> {
     public static final String SELECT_PROFILE_BY_USERNAME = """
             select p.accountId, p.firstName, p.lastName, p.email, p.description, p.createdAt
             from Profile as p, Account as a
-            where p.accountId = a.id
+            where p.accountId = a.id and a.username = :username
             """;
 
     public Profile findByAccountId(String username) {

@@ -21,7 +21,7 @@ create table if not exists Profile(
 create table if not exists FeaturedImage(
     id int not null auto_increment,
     uploadDate date not null,
-    data blob not null,
+    data mediumblob not null,
     fileName varchar(255) not null,
     primary key (id)
 );

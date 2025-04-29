@@ -22,9 +22,9 @@ public class RecipeDao implements Dao<Recipe> {
     private SqlParameterSource namedParams;
 
     private static final String INSERT_RECIPE = """
-            insert into Recipe(title, accountId, createdAt, description, completionTimeInMinutes,
+            insert into Recipe(title, accountId, createdAt, description, completionTimeInMinutes, featuredImageId,
                 numServings, ingredients, instructions)
-            values(:title, :accountId, :createdAt, :description, :completionTimeInMinutes,
+            values(:title, :accountId, :createdAt, :description, :completionTimeInMinutes, :featuredImageId,
                 :numServings, :ingredients, :instructions)
             """;
 

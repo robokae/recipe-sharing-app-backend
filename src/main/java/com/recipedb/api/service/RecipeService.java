@@ -4,10 +4,13 @@ import com.recipedb.api.dao.AccountDao;
 import com.recipedb.api.dao.RecipeDao;
 import com.recipedb.api.dto.RecipeRequest;
 import com.recipedb.api.model.Account;
+import com.recipedb.api.model.Image;
 import com.recipedb.api.model.Recipe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -20,12 +23,17 @@ public class RecipeService {
     @Autowired
     private RecipeDao recipeDao;
 
+    @Autowired
+    private ImageService imageService;
+
     public void create(RecipeRequest recipeDetails) {
         accountDao.findByUsername(recipeDetails.getUsername()).map(Account::getId).ifPresent(accountId -> {
+            Image featuredImage = imageService.saveImage(recipeDetails.getFeaturedImage());
             Recipe recipe = Recipe.builder()
                     .title(recipeDetails.getTitle()).accountId(accountId).createdAt(new Date())
                     .description(recipeDetails.getDescription())
                     .completionTimeInMinutes(recipeDetails.getCompletionTimeInMinutes())
+                    .featuredImageId(featuredImage.getId())
                     .numServings(recipeDetails.getNumServings())
                     .ingredients(recipeDetails.getIngredients())
                     .instructions(recipeDetails.getInstructions()).build();

@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api")
 public class RecipeController {
@@ -23,6 +25,11 @@ public class RecipeController {
     @PostMapping(value = "/recipe", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createRecipe(@RequestPart(value = "featuredImage", required = false) MultipartFile featuredImage,
                                           @RequestPart(value = "recipeRequest") RecipeRequest recipeRequest) {
+
+        if (Objects.nonNull(featuredImage)) {
+            recipeRequest.setFeaturedImage(featuredImage);
+        }
+
         recipeService.create(recipeRequest);
         return ResponseEntity.ok("Recipe created");
     }
