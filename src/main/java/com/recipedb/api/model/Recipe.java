@@ -12,10 +12,10 @@ import java.util.Date;
 public class Recipe {
 
     @Id
-    private int id;
+    private String id;
     private String title;
-    private int accountId;
-    private Integer featuredImageId;
+    private String accountId;
+    private String featuredImageId;
     private Date createdAt;
     private String description;
     private Double rating;

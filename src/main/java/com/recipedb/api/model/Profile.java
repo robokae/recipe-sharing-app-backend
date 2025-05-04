@@ -15,8 +15,8 @@ import java.util.Date;
 public class Profile {
 
     @Id
-    private int id;
-    private Integer accountId;
+    private String id;
+    private String accountId;
     private String firstName;
     private String lastName;
     private String email;

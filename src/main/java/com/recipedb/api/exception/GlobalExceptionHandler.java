@@ -16,16 +16,21 @@ public class GlobalExceptionHandler {
         Map<String, String> errorDetails = Map.of(
                 "field", exception.getFieldName(),
                 "message", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
+        return ResponseEntity.badRequest().body(errorDetails);
     }
 
     @ExceptionHandler({BadCredentialsException.class})
     public ResponseEntity<Object> badCredentialsException(BadCredentialsException exception) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect username or password");
+        return ResponseEntity.badRequest().body("Incorrect username or password");
     }
 
     @ExceptionHandler({UsernameAlreadyExistException.class})
     public ResponseEntity<Object> usernameAlreadyExistsException(UsernameAlreadyExistException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exception.getMessage());
+    }
+
+    @ExceptionHandler({RuntimeException.class})
+    public ResponseEntity<Object> runtimeException(RuntimeException exception) {
+        return ResponseEntity.internalServerError().body(exception.getMessage());
     }
 }

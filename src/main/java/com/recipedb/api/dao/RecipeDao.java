@@ -22,42 +22,61 @@ public class RecipeDao implements Dao<Recipe> {
     private SqlParameterSource namedParams;
 
     private static final String INSERT_RECIPE = """
-            insert into Recipe(title, accountId, createdAt, description, completionTimeInMinutes, featuredImageId,
+            insert into Recipe(id, title, accountId, createdAt, description, completionTimeInMinutes, featuredImageId,
                 numServings, ingredients, instructions)
-            values(:title, :accountId, :createdAt, :description, :completionTimeInMinutes, :featuredImageId,
+            values(:id, :title, :accountId, :createdAt, :description, :completionTimeInMinutes, :featuredImageId,
                 :numServings, :ingredients, :instructions)
             """;
 
-    private static final String SELECT_RECIPES_BY_ACCOUNT_ID = """
-            select r.title, r.accountId, r.createdAt, r.description, r.completionTimeInMinutes, r.numServings,
-                r.ingredients, r.instructions"
+    private static final String SELECT_RECIPES_BY_USERNAME = """
+            select r.id, r.title, r.accountId, r.createdAt, r.description, r.featuredImageId, r.completionTimeInMinutes,
+                r.numServings, r.ingredients, r.instructions
             from Recipe as r, Account as a
             where r.accountId = a.id and a.username = :username
             """;
 
-    private static final String SELECT_ALL_RECIPES = "select * from Recipe";
+    private static final String UPDATE_RECIPE_BY_ID = """
+            update Recipe as r
+            set r.title = :title, r.description = :description, r.featuredImageId = :featuredImageId,
+                r.completionTimeInMinutes = :completionTimeInMinutes, r.numServings = :numServings,
+                r.ingredients = :ingredients, r.instructions = :instructions
+            where r.id = :id
+            """;
+
+    private static final String SELECT_RECIPE_BY_ID = "select * from Recipe where id = :id";
+
+    private static final String SELECT_LATEST_RECIPES = "select * from Recipe order by createdAt desc";
 
     public List<Recipe> getAllByUsername(String username) {
         Account account = Account.builder().username(username).build();
         namedParams = new BeanPropertySqlParameterSource(account);
-        return jdbcTemplate.query(SELECT_RECIPES_BY_ACCOUNT_ID, namedParams, new BeanPropertyRowMapper<>(Recipe.class));
+        return jdbcTemplate.query(SELECT_RECIPES_BY_USERNAME, namedParams, new BeanPropertyRowMapper<>(Recipe.class));
     }
 
-    public List<Recipe> getAllRecipes() {
-        return jdbcTemplate.query(SELECT_ALL_RECIPES, new BeanPropertyRowMapper<>(Recipe.class));
+    public List<Recipe> getLatestRecipes() {
+        return jdbcTemplate.query(SELECT_LATEST_RECIPES, new BeanPropertyRowMapper<>(Recipe.class));
+    }
+
+    public Recipe getRecipeById(String id) {
+        Recipe recipe = new Recipe();
+        recipe.setId(id);
+        namedParams = new BeanPropertySqlParameterSource(recipe);
+        return jdbcTemplate.queryForObject(SELECT_RECIPE_BY_ID, namedParams,
+                new BeanPropertyRowMapper<>(Recipe.class));
     }
 
     @Override
     public Recipe save(Recipe recipe) {
         namedParams = new BeanPropertySqlParameterSource(recipe);
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(INSERT_RECIPE, namedParams, keyHolder);
-        recipe.setId(keyHolder.getKey().intValue());
+        jdbcTemplate.update(INSERT_RECIPE, namedParams);
         return recipe;
     }
 
     @Override
-    public void update(Recipe recipe) {
+    public Recipe update(Recipe recipe) {
+        namedParams = new BeanPropertySqlParameterSource(recipe);
+        jdbcTemplate.update(UPDATE_RECIPE_BY_ID, namedParams);
+        return recipe;
     }
 
     @Override

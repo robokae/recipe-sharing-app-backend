@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AccountService {
@@ -28,20 +30,24 @@ public class AccountService {
     private PasswordEncoder passwordEncoder;
 
     public Profile createAccount(RegisterRequest registerDetails) {
-        accountDao.findByUsername(registerDetails.getUsername()).ifPresent(account -> {
-            throw new UsernameAlreadyExistException("Account with username already exists");
-        });
+        Optional.ofNullable(accountDao.findByUsername(registerDetails.getUsername()))
+                .ifPresent(account -> {
+                    throw new UsernameAlreadyExistException("Account with username already exists");
+                });
 
         String encryptedPassword = passwordEncoder.encode(registerDetails.getPassword());
 
-        Account savedAccount = accountDao.save(Account.builder()
-                .username(registerDetails.getUsername())
-                .password(encryptedPassword)
-                .role("USER").build());
+        Account savedAccount = accountDao.save(
+                Account.builder()
+                        .id(UUID.randomUUID().toString())
+                        .username(registerDetails.getUsername()).password(encryptedPassword)
+                        .role("USER").build());
 
-        return profileService.createProfile(Profile.builder()
-                .firstName(registerDetails.getFirstName()).lastName(registerDetails.getLastName())
-                .accountId(savedAccount.getId()).email(registerDetails.getEmail())
-                .createdAt(new Date()).build());
+        return profileService.createProfile(
+                Profile.builder()
+                        .id(UUID.randomUUID().toString())
+                        .firstName(registerDetails.getFirstName()).lastName(registerDetails.getLastName())
+                        .accountId(savedAccount.getId()).email(registerDetails.getEmail())
+                        .createdAt(new Date()).build());
     }
 }

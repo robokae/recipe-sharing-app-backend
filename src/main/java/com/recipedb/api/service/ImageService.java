@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ImageService {
@@ -21,17 +22,16 @@ public class ImageService {
         Image img = null;
         try {
             img = Image.builder()
-                    .uploadDate(new Date())
-                    .data(image.getBytes())
-                    .fileName(image.getName())
-                    .build();
+                    .id(UUID.randomUUID().toString())
+                    .uploadDate(new Date()).data(image.getBytes())
+                    .fileName(image.getName()).build();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error occurred while processing image");
         }
         return imageDao.save(img);
     }
 
-    public String getById(int id) {
+    public String getById(String id) {
         return Optional.ofNullable(imageDao.getById(id))
                 .map(Image::getData)
                 .map(bytes -> Base64.getEncoder().encodeToString(bytes))

@@ -19,13 +19,13 @@ public class ImageDao implements Dao<Image> {
     private SqlParameterSource namedParams;
 
     private static final String INSERT_IMAGE = """
-            insert into FeaturedImage(fileName, data, uploadDate)
-            values(:fileName, :data, :uploadDate)
+            insert into FeaturedImage(id, fileName, data, uploadDate)
+            values(:id, :fileName, :data, :uploadDate)
             """;
 
     private static final String SELECT_IMAGE_BY_ID = "select * from FeaturedImage where id = :id";
 
-    public Image getById(Integer id) {
+    public Image getById(String id) {
         Image image = new Image();
         image.setId(id);
         namedParams = new BeanPropertySqlParameterSource(image);
@@ -35,15 +35,13 @@ public class ImageDao implements Dao<Image> {
     @Override
     public Image save(Image image) {
         namedParams = new BeanPropertySqlParameterSource(image);
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(INSERT_IMAGE, namedParams, keyHolder);
-        image.setId(keyHolder.getKey().intValue());
+        jdbcTemplate.update(INSERT_IMAGE, namedParams);
         return image;
     }
 
     @Override
-    public void update(Image image) {
-
+    public Image update(Image image) {
+        return null;
     }
 
     @Override

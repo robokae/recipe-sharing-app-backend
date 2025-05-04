@@ -15,7 +15,7 @@ import java.util.Date;
 public class Image {
 
     @Id
-    private int id;
+    private String id;
     private Date uploadDate;
     private byte[] data;
     private String fileName;

@@ -7,8 +7,6 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,8 +19,8 @@ public class ProfileDao implements Dao<Profile> {
     private SqlParameterSource namedParams;
 
     public static final String INSERT_PROFILE = """
-            insert into Profile(accountId, firstName, lastName, email, description, createdAt)
-            values (:accountId, :firstName, :lastName, :email, :description, :createdAt)
+            insert into Profile(id, accountId, firstName, lastName, email, description, createdAt)
+            values (:id, :accountId, :firstName, :lastName, :email, :description, :createdAt)
             """;
 
     public static final String SELECT_PROFILE_BY_USERNAME = """
@@ -31,24 +29,37 @@ public class ProfileDao implements Dao<Profile> {
             where p.accountId = a.id and a.username = :username
             """;
 
-    public Profile findByAccountId(String username) {
+    public static final String SELECT_PROFILE_BY_ACCOUNT_ID = """
+            select p.accountId, p.firstName, p.lastName, p.email, p.description, p.createdAt
+            from Profile as p, Account as a
+            where p.accountId = a.id and a.id = :id
+            """;
+
+    public Profile findByUsername(String username) {
         Account account = Account.builder().username(username).build();
         namedParams = new BeanPropertySqlParameterSource(account);
         return jdbcTemplate.queryForObject(SELECT_PROFILE_BY_USERNAME, namedParams,
                 new BeanPropertyRowMapper<>(Profile.class));
     }
 
+    public Profile findByAccountId(String accountId) {
+        Account account = new Account();
+        account.setId(accountId);
+        namedParams = new BeanPropertySqlParameterSource(account);
+        return jdbcTemplate.queryForObject(SELECT_PROFILE_BY_ACCOUNT_ID, namedParams, new BeanPropertyRowMapper<>(Profile.class));
+    }
+
     @Override
     public Profile save(Profile profile) {
         namedParams = new BeanPropertySqlParameterSource(profile);
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(INSERT_PROFILE, namedParams, keyHolder);
-        profile.setId(keyHolder.getKey().intValue());
+        jdbcTemplate.update(INSERT_PROFILE, namedParams);
         return profile;
     }
 
     @Override
-    public void update(Profile profile) {}
+    public Profile update(Profile profile) {
+        return null;
+    }
 
     @Override
     public void delete(Profile profile) {}

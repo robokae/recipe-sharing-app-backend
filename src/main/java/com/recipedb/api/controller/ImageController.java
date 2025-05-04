@@ -16,7 +16,7 @@ public class ImageController {
     private ImageService imageService;
 
     @GetMapping("/featuredImage/{id}")
-    public ResponseEntity<String> getImageById(@PathVariable int id) {
+    public ResponseEntity<String> getImageById(@PathVariable String id) {
         return ResponseEntity.ok(imageService.getById(id));
     }
 }

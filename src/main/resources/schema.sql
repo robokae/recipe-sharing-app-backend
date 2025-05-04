@@ -1,14 +1,14 @@
 create table if not exists Account(
-    id int not null auto_increment,
+    id char(36) not null,
     username varchar(32) unique not null,
     password varchar(64) not null,
-    role varchar(64) not null default 'USER',
+    role varchar(64) not null,
     primary key (id)
 );
 
 create table if not exists Profile(
-    id int not null auto_increment,
-    accountId int not null,
+    id char(36) not null,
+    accountId char(36) not null,
     firstName varchar(255) not null,
     lastName varchar(255) not null,
     email varchar(255) unique not null,
@@ -19,7 +19,7 @@ create table if not exists Profile(
 );
 
 create table if not exists FeaturedImage(
-    id int not null auto_increment,
+    id char(36) not null,
     uploadDate date not null,
     data mediumblob not null,
     fileName varchar(255) not null,
@@ -27,10 +27,10 @@ create table if not exists FeaturedImage(
 );
 
 create table if not exists Recipe(
-    id int not null auto_increment,
+    id char(36) not null,
     title varchar(255) not null,
-    accountId int not null,
-    featuredImageId int,
+    accountId char(36) not null,
+    featuredImageId char(36),
     createdAt date not null,
     description text,
     rating numeric,
@@ -44,19 +44,18 @@ create table if not exists Recipe(
 );
 
 create table if not exists Save(
-    id int not null auto_increment,
-    accountId int not null,
-    recipeId int not null,
+    accountId char(36) not null,
+    recipeId char(36) not null,
     createdAt date not null,
-    primary key (id),
+    primary key (accountId, recipeId),
     foreign key (accountId) references Account(id),
     foreign key (recipeId) references Recipe(id)
 );
 
 create table if not exists Review(
-    id int not null auto_increment,
-    accountId int not null,
-    recipeId int not null,
+    id char(36) not null,
+    accountId char(36) not null,
+    recipeId char(36) not null,
     score numeric not null,
     description text not null,
     createdAt date not null,
@@ -66,18 +65,17 @@ create table if not exists Review(
 );
 
 create table if not exists Follow(
-    id int not null auto_increment,
-    accountId int not null,
-    followerId int not null,
-    primary key (id),
+    accountId char(36) not null,
+    followerId char(36) not null,
+    primary key (accountId, followerId),
     foreign key (accountId) references Account(id),
     foreign key (followerId) references Account(id)
 );
 
 create table if not exists Ingredient(
-    id int not null auto_increment,
-    accountId int not null,
-    recipeId int not null,
+    id char(36) not null,
+    accountId char(36) not null,
+    recipeId char(36) not null,
     name varchar(255) not null,
     createdAt date not null,
     primary key (id),
