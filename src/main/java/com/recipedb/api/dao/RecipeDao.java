@@ -2,13 +2,12 @@ package com.recipedb.api.dao;
 
 import com.recipedb.api.model.Account;
 import com.recipedb.api.model.Recipe;
+import com.recipedb.api.model.Save;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -35,6 +34,18 @@ public class RecipeDao implements Dao<Recipe> {
             where r.accountId = a.id and a.username = :username
             """;
 
+    private static final String SELECT_SAVED_RECIPES_BY_USERNAME = """
+            select *
+            from Recipe r
+            join (
+                select s.accountId, s.recipeId
+                from Save s
+                join (select id as accountId from Account where username = :username) a
+                on s.accountId = a.accountId
+            ) userSaved
+            on r.id = userSaved.recipeId
+            """;
+
     private static final String UPDATE_RECIPE_BY_ID = """
             update Recipe as r
             set r.title = :title, r.description = :description, r.featuredImageId = :featuredImageId,
@@ -47,10 +58,27 @@ public class RecipeDao implements Dao<Recipe> {
 
     private static final String SELECT_LATEST_RECIPES = "select * from Recipe order by createdAt desc";
 
+    private static final String INSERT_SAVE = """
+            insert into Save(accountId, recipeId, createdAt)
+            values(:accountId, :recipeId, :createdAt)
+            """;
+
+    private static final String DELETE_SAVE = "delete from save where accountId = :accountId and recipeId = :recipeId";
+
     public List<Recipe> getAllByUsername(String username) {
-        Account account = Account.builder().username(username).build();
+        Account account = new Account();
+        account.setUsername(username);
         namedParams = new BeanPropertySqlParameterSource(account);
-        return jdbcTemplate.query(SELECT_RECIPES_BY_USERNAME, namedParams, new BeanPropertyRowMapper<>(Recipe.class));
+        return jdbcTemplate.query(SELECT_RECIPES_BY_USERNAME, namedParams,
+                new BeanPropertyRowMapper<>(Recipe.class));
+    }
+
+    public List<Recipe> getSavedByUsername(String username) {
+        Account account = new Account();
+        account.setUsername(username);
+        namedParams = new BeanPropertySqlParameterSource(account);
+        return jdbcTemplate.query(SELECT_SAVED_RECIPES_BY_USERNAME, namedParams,
+                new BeanPropertyRowMapper<>(Recipe.class));
     }
 
     public List<Recipe> getLatestRecipes() {
@@ -63,6 +91,19 @@ public class RecipeDao implements Dao<Recipe> {
         namedParams = new BeanPropertySqlParameterSource(recipe);
         return jdbcTemplate.queryForObject(SELECT_RECIPE_BY_ID, namedParams,
                 new BeanPropertyRowMapper<>(Recipe.class));
+    }
+
+    public void saveRecipeForAccount(Save save) {
+        updateSave(INSERT_SAVE, save);
+    }
+
+    public void deleteSaveForAccount(Save save) {
+        updateSave(DELETE_SAVE, save);
+    }
+
+    public void updateSave(String query, Save save) {
+        namedParams = new BeanPropertySqlParameterSource(save);
+        jdbcTemplate.update(query, namedParams);
     }
 
     @Override

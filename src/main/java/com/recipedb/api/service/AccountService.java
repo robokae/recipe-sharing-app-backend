@@ -50,4 +50,8 @@ public class AccountService {
                         .accountId(savedAccount.getId()).email(registerDetails.getEmail())
                         .createdAt(new Date()).build());
     }
+
+    public String getAccountId(String username) {
+        return accountDao.findByUsername(username).getId();
+    }
 }

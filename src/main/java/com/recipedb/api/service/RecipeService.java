@@ -1,13 +1,11 @@
 package com.recipedb.api.service;
 
-import com.recipedb.api.dao.AccountDao;
 import com.recipedb.api.dao.RecipeDao;
 import com.recipedb.api.dto.RecipePreviewResponse;
 import com.recipedb.api.dto.RecipeRequest;
 import com.recipedb.api.dto.RecipeResponse;
-import com.recipedb.api.model.Account;
-import com.recipedb.api.model.Profile;
-import com.recipedb.api.model.Recipe;
+import com.recipedb.api.dto.SaveRequest;
+import com.recipedb.api.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -19,7 +17,7 @@ import java.util.*;
 public class RecipeService {
 
     @Autowired
-    private AccountDao accountDao;
+    private AccountService accountService;
 
     @Autowired
     private RecipeDao recipeDao;
@@ -31,7 +29,7 @@ public class RecipeService {
     private ImageService imageService;
 
     public void create(RecipeRequest recipeDetails) {
-        Account account = accountDao.findByUsername(recipeDetails.getUsername());
+        String accountId = accountService.getAccountId(recipeDetails.getUsername());
 
         Recipe.RecipeBuilder recipeBuilder = Recipe.builder();
 
@@ -42,7 +40,7 @@ public class RecipeService {
 
         recipeBuilder
                 .id(UUID.randomUUID().toString())
-                .title(recipeDetails.getTitle()).accountId(account.getId()).createdAt(new Date())
+                .title(recipeDetails.getTitle()).accountId(accountId).createdAt(new Date())
                 .description(recipeDetails.getDescription())
                 .completionTimeInMinutes(recipeDetails.getCompletionTimeInMinutes())
                 .numServings(recipeDetails.getNumServings()).ingredients(recipeDetails.getIngredients())
@@ -50,10 +48,6 @@ public class RecipeService {
 
         recipeDao.save(recipeBuilder.build());
     }
-
-    public void update() {}
-
-    public void get(String id) {}
 
     public List<RecipePreviewResponse> getLatestRecipes() {
         return recipeDao.getLatestRecipes().stream()
@@ -76,6 +70,28 @@ public class RecipeService {
     public List<RecipePreviewResponse> getRecipesForUser(String username) {
         return recipeDao.getAllByUsername(username).stream()
                 .map(this::getRecipePreview).toList();
+    }
+
+    public List<RecipePreviewResponse> getSavedRecipesForUser(String username) {
+        return recipeDao.getSavedByUsername(username).stream()
+                .map(this::getRecipePreview).toList();
+    }
+
+    public void saveRecipe(SaveRequest saveRequest) {
+        Save save = createSave(saveRequest.getRecipeId(), saveRequest.getUsername());
+        recipeDao.saveRecipeForAccount(save);
+    }
+
+    public void deleteSave(String recipeId, String username) {
+        Save save = createSave(recipeId, username);
+        recipeDao.deleteSaveForAccount(save);
+    }
+
+    private Save createSave(String recipeId, String username) {
+        String accountId = accountService.getAccountId(username);
+        return Save.builder()
+                .accountId(accountId).recipeId(recipeId)
+                .createdAt(new Date()).build();
     }
 
     public Recipe updateRecipe(String id, Map<String, Object> updates) {
