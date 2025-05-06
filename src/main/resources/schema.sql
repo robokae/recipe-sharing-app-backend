@@ -82,3 +82,13 @@ create table if not exists Ingredient(
     foreign key (accountId) references Account(id),
     foreign key (recipeId) references Recipe(id)
 );
+
+create or replace view ProfileSummary as
+select
+    a.username,
+    p.firstName, p.lastName, p.createdAt as joinDate, p.description,
+    count(r.id) as numRecipes
+from Account a
+join Profile p on a.id = p.accountId
+left join Recipe r on r.accountId = a.id
+group by a.username, p.firstName, p.lastName, p.createdAt, p.description;

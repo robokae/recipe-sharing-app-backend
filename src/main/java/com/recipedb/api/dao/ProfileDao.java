@@ -2,6 +2,7 @@ package com.recipedb.api.dao;
 
 import com.recipedb.api.model.Account;
 import com.recipedb.api.model.Profile;
+import com.recipedb.api.model.ProfileSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -23,11 +24,9 @@ public class ProfileDao implements Dao<Profile> {
             values (:id, :accountId, :firstName, :lastName, :email, :description, :createdAt)
             """;
 
-    public static final String SELECT_PROFILE_BY_USERNAME = """
-            select p.accountId, p.firstName, p.lastName, p.email, p.description, p.createdAt
-            from Profile as p, Account as a
-            where p.accountId = a.id and a.username = :username
-            """;
+    public static final String SELECT_PROFILE_SUMMARY_BY_USERNAME =
+            "select * from ProfileSummary " +
+            "where username = :username";
 
     public static final String SELECT_PROFILE_BY_ACCOUNT_ID = """
             select p.accountId, p.firstName, p.lastName, p.email, p.description, p.createdAt
@@ -35,11 +34,12 @@ public class ProfileDao implements Dao<Profile> {
             where p.accountId = a.id and a.id = :id
             """;
 
-    public Profile findByUsername(String username) {
-        Account account = Account.builder().username(username).build();
+    public ProfileSummary findSummaryByUsername(String username) {
+        Account account = new Account();
+        account.setUsername(username);
         namedParams = new BeanPropertySqlParameterSource(account);
-        return jdbcTemplate.queryForObject(SELECT_PROFILE_BY_USERNAME, namedParams,
-                new BeanPropertyRowMapper<>(Profile.class));
+        return jdbcTemplate.queryForObject(SELECT_PROFILE_SUMMARY_BY_USERNAME, namedParams,
+                new BeanPropertyRowMapper<>(ProfileSummary.class));
     }
 
     public Profile findByAccountId(String accountId) {
