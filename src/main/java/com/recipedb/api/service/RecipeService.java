@@ -1,7 +1,7 @@
 package com.recipedb.api.service;
 
 import com.recipedb.api.dao.RecipeDao;
-import com.recipedb.api.dto.RecipePreviewResponse;
+import com.recipedb.api.model.RecipePreview;
 import com.recipedb.api.dto.RecipeRequest;
 import com.recipedb.api.dto.RecipeResponse;
 import com.recipedb.api.dto.SaveRequest;
@@ -49,7 +49,7 @@ public class RecipeService {
         recipeDao.save(recipeBuilder.build());
     }
 
-    public List<RecipePreviewResponse> getLatestRecipes() {
+    public List<RecipePreview> getLatestRecipes() {
         return recipeDao.getLatestRecipes().stream()
                 .map(this::getRecipePreview).toList();
     }
@@ -67,12 +67,11 @@ public class RecipeService {
                 .numServings(recipe.getNumServings()).build();
     }
 
-    public List<RecipePreviewResponse> getRecipesForUser(String username) {
-        return recipeDao.getAllByUsername(username).stream()
-                .map(this::getRecipePreview).toList();
+    public List<RecipePreview> getRecipesForUser(String username) {
+        return recipeDao.getAllByUsername(username);
     }
 
-    public List<RecipePreviewResponse> getSavedRecipesForUser(String username) {
+    public List<RecipePreview> getSavedRecipesForUser(String username) {
         return recipeDao.getSavedByUsername(username).stream()
                 .map(this::getRecipePreview).toList();
     }
@@ -122,8 +121,8 @@ public class RecipeService {
 
     public void delete(String id) {}
 
-    private RecipePreviewResponse getRecipePreview(Recipe recipe) {
-        RecipePreviewResponse.RecipePreviewResponseBuilder recipePreviewBuilder = RecipePreviewResponse.builder();
+    private RecipePreview getRecipePreview(Recipe recipe) {
+        RecipePreview.RecipePreviewBuilder recipePreviewBuilder = RecipePreview.builder();
 
         Optional.ofNullable(recipe.getFeaturedImageId()).ifPresent(recipePreviewBuilder::featuredImageId);
         Optional.ofNullable(recipe.getDescription()).ifPresent(recipePreviewBuilder::description);

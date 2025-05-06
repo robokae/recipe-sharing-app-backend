@@ -1,5 +1,6 @@
 package com.recipedb.api.dao;
 
+import com.recipedb.api.model.RecipePreview;
 import com.recipedb.api.model.Account;
 import com.recipedb.api.model.Recipe;
 import com.recipedb.api.model.Save;
@@ -27,12 +28,7 @@ public class RecipeDao implements Dao<Recipe> {
                 :numServings, :ingredients, :instructions)
             """;
 
-    private static final String SELECT_RECIPES_BY_USERNAME = """
-            select r.id, r.title, r.accountId, r.createdAt, r.description, r.featuredImageId, r.completionTimeInMinutes,
-                r.numServings, r.ingredients, r.instructions
-            from Recipe as r, Account as a
-            where r.accountId = a.id and a.username = :username
-            """;
+    private static final String SELECT_RECIPES_BY_USERNAME = "select * from RecipePreview where username = :username";
 
     private static final String SELECT_SAVED_RECIPES_BY_USERNAME = """
             select *
@@ -65,12 +61,12 @@ public class RecipeDao implements Dao<Recipe> {
 
     private static final String DELETE_SAVE = "delete from save where accountId = :accountId and recipeId = :recipeId";
 
-    public List<Recipe> getAllByUsername(String username) {
+    public List<RecipePreview> getAllByUsername(String username) {
         Account account = new Account();
         account.setUsername(username);
         namedParams = new BeanPropertySqlParameterSource(account);
         return jdbcTemplate.query(SELECT_RECIPES_BY_USERNAME, namedParams,
-                new BeanPropertyRowMapper<>(Recipe.class));
+                new BeanPropertyRowMapper<>(RecipePreview.class));
     }
 
     public List<Recipe> getSavedByUsername(String username) {

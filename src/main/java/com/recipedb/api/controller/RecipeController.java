@@ -1,6 +1,6 @@
 package com.recipedb.api.controller;
 
-import com.recipedb.api.dto.RecipePreviewResponse;
+import com.recipedb.api.model.RecipePreview;
 import com.recipedb.api.dto.RecipeRequest;
 import com.recipedb.api.dto.RecipeResponse;
 import com.recipedb.api.dto.SaveRequest;
@@ -39,12 +39,12 @@ public class RecipeController {
     }
 
     @GetMapping("/recipes/{username}")
-    public ResponseEntity<List<RecipePreviewResponse>> getRecipesForUser(@PathVariable String username) {
+    public ResponseEntity<List<RecipePreview>> getRecipesForUser(@PathVariable String username) {
         return ResponseEntity.ok(recipeService.getRecipesForUser(username));
     }
 
     @GetMapping("/recipes/saved/{username}")
-    public ResponseEntity<List<RecipePreviewResponse>> getSavedRecipesForUser(@PathVariable String username) {
+    public ResponseEntity<List<RecipePreview>> getSavedRecipesForUser(@PathVariable String username) {
         return ResponseEntity.ok(recipeService.getSavedRecipesForUser(username));
     }
 

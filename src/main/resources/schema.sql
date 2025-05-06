@@ -92,3 +92,11 @@ from Account a
 join Profile p on a.id = p.accountId
 left join Recipe r on r.accountId = a.id
 group by a.username, p.firstName, p.lastName, p.createdAt, p.description;
+
+create or replace view RecipePreview as
+select
+    r.id, r.title, r.featuredImageId, r.description, r.rating,
+    a.username,
+    p.firstName, p.lastName
+from Account a, Recipe r, Profile p
+where a.id = p.accountId and r.accountId = a.id;
