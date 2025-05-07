@@ -100,3 +100,41 @@ select
     p.firstName, p.lastName
 from Account a, Recipe r, Profile p
 where a.id = p.accountId and r.accountId = a.id;
+
+drop trigger if exists after_review_insert;
+
+create trigger after_review_insert
+after insert on Review
+for each row
+    update Recipe
+    set rating = (
+        select avg(score)
+        from Review
+        where recipeId = new.recipeId
+    )
+    where id = new.recipeId;
+
+drop procedure if exists average_rating;
+
+create procedure average_rating(in username varchar(255), out user_average_rating numeric)
+    select avg(r.score) into user_average_rating
+    from Review r, Recipe rcp, Account a
+    where r.recipeId = rcp.id and rcp.accountId = a.id and a.username = username;
+
+drop procedure if exists get_recipes_under_half_hour;
+
+create procedure get_recipes_under_half_hour()
+    select id, title, completionTimeInMinutes
+    from Recipe
+    where completionTimeInMinutes < 30;
+
+create function get_username(accountId char(36))
+returns varchar(255)
+deterministic
+begin
+declare result varchar(255);
+    select username into result
+    from Account
+    where id = accountId;
+    return result;
+end;
