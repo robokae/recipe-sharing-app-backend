@@ -1,4 +1,13 @@
-create table if not exists Account(
+drop table if exists Follow;
+drop table if exists Save;
+drop table if exists Review;
+drop table if exists Ingredient;
+drop table if exists Recipe;
+drop table if exists Profile;
+drop table if exists FeaturedImage;
+drop table if exists Account;
+
+create table Account(
     id char(36) not null,
     username varchar(32) unique not null,
     password varchar(64) not null,
@@ -6,7 +15,7 @@ create table if not exists Account(
     primary key (id)
 );
 
-create table if not exists Profile(
+create table Profile(
     id char(36) not null,
     accountId char(36) not null,
     firstName varchar(255) not null,
@@ -18,7 +27,7 @@ create table if not exists Profile(
     foreign key (accountId) references Account(id)
 );
 
-create table if not exists FeaturedImage(
+create table FeaturedImage(
     id char(36) not null,
     uploadDate date not null,
     data mediumblob not null,
@@ -26,7 +35,7 @@ create table if not exists FeaturedImage(
     primary key (id)
 );
 
-create table if not exists Recipe(
+create table Recipe(
     id char(36) not null,
     title varchar(255) not null,
     accountId char(36) not null,
@@ -43,7 +52,7 @@ create table if not exists Recipe(
     foreign key (featuredImageId) references FeaturedImage(id)
 );
 
-create table if not exists Save(
+create table Save(
     accountId char(36) not null,
     recipeId char(36) not null,
     createdAt date not null,
@@ -52,7 +61,7 @@ create table if not exists Save(
     foreign key (recipeId) references Recipe(id)
 );
 
-create table if not exists Review(
+create table Review(
     id char(36) not null,
     accountId char(36) not null,
     recipeId char(36) not null,
@@ -64,7 +73,7 @@ create table if not exists Review(
     foreign key (recipeId) references Recipe(id)
 );
 
-create table if not exists Follow(
+create table Follow(
     accountId char(36) not null,
     followerId char(36) not null,
     primary key (accountId, followerId),
@@ -72,7 +81,7 @@ create table if not exists Follow(
     foreign key (followerId) references Account(id)
 );
 
-create table if not exists Ingredient(
+create table Ingredient(
     id char(36) not null,
     accountId char(36) not null,
     recipeId char(36) not null,
