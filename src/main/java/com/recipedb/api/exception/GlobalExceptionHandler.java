@@ -1,5 +1,6 @@
 package com.recipedb.api.exception;
 
+import com.recipedb.api.constants.ErrorMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,7 +22,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({BadCredentialsException.class})
     public ResponseEntity<Object> badCredentialsException(BadCredentialsException exception) {
-        return ResponseEntity.badRequest().body("Incorrect username or password");
+        return ResponseEntity.badRequest().body(ErrorMessages.INVALID_CREDENTIALS);
     }
 
     @ExceptionHandler({UsernameAlreadyExistException.class})

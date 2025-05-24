@@ -1,7 +1,9 @@
 package com.recipedb.api.service;
 
-import com.recipedb.api.dao.AccountDao;
-import com.recipedb.api.dao.ProfileDao;
+import com.recipedb.api.constants.ErrorMessages;
+import com.recipedb.api.exception.AccountNotFoundException;
+import com.recipedb.api.repository.AccountRepository;
+import com.recipedb.api.repository.ProfileDao;
 import com.recipedb.api.exception.UsernameAlreadyExistException;
 import com.recipedb.api.model.Account;
 import com.recipedb.api.dto.RegisterRequest;
@@ -11,14 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class AccountService {
 
     @Autowired
-    private AccountDao accountDao;
+    private AccountRepository accountRepository;
 
     @Autowired
     private ProfileService profileService;
@@ -30,28 +31,31 @@ public class AccountService {
     private PasswordEncoder passwordEncoder;
 
     public Profile createAccount(RegisterRequest registerDetails) {
-        Optional.ofNullable(accountDao.findByUsername(registerDetails.getUsername()))
-                .ifPresent(account -> {
-                    throw new UsernameAlreadyExistException("Account with username already exists");
-                });
 
-        String encryptedPassword = passwordEncoder.encode(registerDetails.getPassword());
+        accountRepository.findByUsername(registerDetails.getUsername()).ifPresent(account -> {
+            throw new UsernameAlreadyExistException(ErrorMessages.USERNAME_ALREADY_EXISTS);
+        });
 
-        Account savedAccount = accountDao.save(
-                Account.builder()
-                        .id(UUID.randomUUID().toString())
-                        .username(registerDetails.getUsername()).password(encryptedPassword)
-                        .role("USER").build());
+        Account account = Account.builder()
+                .id(UUID.randomUUID().toString())
+                .username(registerDetails.getUsername())
+                .password(passwordEncoder.encode(registerDetails.getPassword()))
+                .role("USER").build();
 
-        return profileService.createProfile(
-                Profile.builder()
-                        .id(UUID.randomUUID().toString())
-                        .firstName(registerDetails.getFirstName()).lastName(registerDetails.getLastName())
-                        .accountId(savedAccount.getId()).email(registerDetails.getEmail())
-                        .createdAt(new Date()).build());
+        Account savedAccount = accountRepository.save(account);
+
+        Profile profile = Profile.builder()
+                .id(UUID.randomUUID().toString())
+                .firstName(registerDetails.getFirstName()).lastName(registerDetails.getLastName())
+                .accountId(savedAccount.getId()).email(registerDetails.getEmail())
+                .createdAt(new Date()).build();
+
+        return profileService.createProfile(profile);
     }
 
     public String getAccountId(String username) {
-        return accountDao.findByUsername(username).getId();
+        return accountRepository.findByUsername(username)
+                .map(Account::getId)
+                .orElseThrow(() -> new AccountNotFoundException(ErrorMessages.ACCOUNT_NOT_FOUND));
     }
 }

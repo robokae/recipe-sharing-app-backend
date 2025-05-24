@@ -1,8 +1,6 @@
 package com.recipedb.api.service;
 
-import com.recipedb.api.dao.AccountDao;
 import com.recipedb.api.dto.LoginRequest;
-import com.recipedb.api.util.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,12 +12,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoginService {
-
-    @Autowired
-    private AccountDao accountDao;
-
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     private AuthenticationManager authenticationManager;

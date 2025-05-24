@@ -1,13 +1,13 @@
-drop table if exists Follow;
-drop table if exists Save;
-drop table if exists Review;
-drop table if exists Ingredient;
-drop table if exists Recipe;
-drop table if exists Profile;
-drop table if exists FeaturedImage;
-drop table if exists Account;
+--drop table if exists Follow;
+--drop table if exists Save;
+--drop table if exists Review;
+--drop table if exists Ingredient;
+--drop table if exists Recipe;
+--drop table if exists Profile;
+--drop table if exists FeaturedImage;
+--drop table if exists Account;
 
-create table Account(
+create table if not exists Account(
     id char(36) not null,
     username varchar(32) unique not null,
     password varchar(64) not null,
@@ -15,7 +15,7 @@ create table Account(
     primary key (id)
 );
 
-create table Profile(
+create table if not exists Profile(
     id char(36) not null,
     accountId char(36) not null,
     firstName varchar(255) not null,
@@ -27,7 +27,7 @@ create table Profile(
     foreign key (accountId) references Account(id)
 );
 
-create table FeaturedImage(
+create table if not exists FeaturedImage(
     id char(36) not null,
     uploadDate date not null,
     data mediumblob not null,
@@ -35,7 +35,7 @@ create table FeaturedImage(
     primary key (id)
 );
 
-create table Recipe(
+create table if not exists Recipe(
     id char(36) not null,
     title varchar(255) not null,
     accountId char(36) not null,
@@ -52,7 +52,7 @@ create table Recipe(
     foreign key (featuredImageId) references FeaturedImage(id)
 );
 
-create table Save(
+create table if not exists Save(
     accountId char(36) not null,
     recipeId char(36) not null,
     createdAt date not null,
@@ -61,7 +61,7 @@ create table Save(
     foreign key (recipeId) references Recipe(id)
 );
 
-create table Review(
+create table if not exists Review(
     id char(36) not null,
     accountId char(36) not null,
     recipeId char(36) not null,
@@ -73,7 +73,7 @@ create table Review(
     foreign key (recipeId) references Recipe(id)
 );
 
-create table Follow(
+create table if not exists Follow(
     accountId char(36) not null,
     followerId char(36) not null,
     primary key (accountId, followerId),
@@ -81,7 +81,7 @@ create table Follow(
     foreign key (followerId) references Account(id)
 );
 
-create table Ingredient(
+create table if not exists Ingredient(
     id char(36) not null,
     accountId char(36) not null,
     recipeId char(36) not null,
@@ -137,13 +137,13 @@ create procedure get_recipes_under_half_hour()
     from Recipe
     where completionTimeInMinutes < 30;
 
-create function get_username(accountId char(36))
-returns varchar(255)
-deterministic
-begin
-declare result varchar(255);
-    select username into result
-    from Account
-    where id = accountId;
-    return result;
-end;
+--create function get_username(accountId char(36))
+--returns varchar(255)
+--deterministic
+--begin
+--declare result varchar(255);
+--    select username into result
+--    from Account
+--    where id = accountId;
+--    return result;
+--end;
