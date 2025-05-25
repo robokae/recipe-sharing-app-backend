@@ -3,7 +3,6 @@ package com.recipedb.api.service;
 import com.recipedb.api.constants.ErrorMessages;
 import com.recipedb.api.exception.AccountNotFoundException;
 import com.recipedb.api.repository.AccountRepository;
-import com.recipedb.api.repository.ProfileDao;
 import com.recipedb.api.exception.UsernameAlreadyExistException;
 import com.recipedb.api.model.Account;
 import com.recipedb.api.dto.RegisterRequest;
@@ -25,9 +24,6 @@ public class AccountService {
     private ProfileService profileService;
 
     @Autowired
-    private ProfileDao profileDao;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public Profile createAccount(RegisterRequest registerDetails) {
@@ -45,9 +41,9 @@ public class AccountService {
         Account savedAccount = accountRepository.save(account);
 
         Profile profile = Profile.builder()
-                .id(UUID.randomUUID().toString())
+                .accountId(savedAccount.getId())
                 .firstName(registerDetails.getFirstName()).lastName(registerDetails.getLastName())
-                .accountId(savedAccount.getId()).email(registerDetails.getEmail())
+                .email(registerDetails.getEmail())
                 .createdAt(new Date()).build();
 
         return profileService.createProfile(profile);

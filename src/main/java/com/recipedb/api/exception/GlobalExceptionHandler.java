@@ -1,6 +1,7 @@
 package com.recipedb.api.exception;
 
 import com.recipedb.api.constants.ErrorMessages;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,6 +33,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<Object> runtimeException(RuntimeException exception) {
+        return ResponseEntity.internalServerError().body(exception.getMessage());
+    }
+
+    @ExceptionHandler({EntityNotFoundException.class})
+    public ResponseEntity<Object> entityNotFoundException(EntityNotFoundException exception) {
         return ResponseEntity.internalServerError().body(exception.getMessage());
     }
 }

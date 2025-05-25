@@ -1,6 +1,6 @@
 package com.recipedb.api.controller;
 
-import com.recipedb.api.model.ProfileSummary;
+import com.recipedb.api.dto.ProfileResponse;
 import com.recipedb.api.service.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ public class ProfileController {
     private ProfileService profileService;
 
     @GetMapping("/summary/{username}")
-    public ResponseEntity<ProfileSummary> getProfile(@PathVariable String username) {
+    public ResponseEntity<ProfileResponse> getProfile(@PathVariable String username) {
         return ResponseEntity.ok(profileService.getByUsername(username));
     }
 }

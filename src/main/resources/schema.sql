@@ -1,11 +1,11 @@
---drop table if exists Follow;
---drop table if exists Save;
---drop table if exists Review;
---drop table if exists Ingredient;
---drop table if exists Recipe;
---drop table if exists Profile;
---drop table if exists FeaturedImage;
---drop table if exists Account;
+drop table if exists Follow;
+drop table if exists Save;
+drop table if exists Review;
+drop table if exists Ingredient;
+drop table if exists Recipe;
+drop table if exists Profile;
+drop table if exists FeaturedImage;
+drop table if exists Account;
 
 create table if not exists Account(
     id char(36) not null,
@@ -16,14 +16,13 @@ create table if not exists Account(
 );
 
 create table if not exists Profile(
-    id char(36) not null,
     accountId char(36) not null,
     firstName varchar(255) not null,
     lastName varchar(255) not null,
     email varchar(255) unique not null,
     description text,
     createdAt date not null,
-    primary key (id),
+    primary key (accountId),
     foreign key (accountId) references Account(id)
 );
 
@@ -94,8 +93,8 @@ create table if not exists Ingredient(
 
 create or replace view ProfileSummary as
 select
-    a.username,
-    p.firstName, p.lastName, p.createdAt as joinDate, p.description,
+    a.username as username, p.firstName as firstName, p.lastName as lastName,
+    p.createdAt as joinDate, coalesce(p.description, 'No description available') as description,
     count(r.id) as numRecipes
 from Account a
 join Profile p on a.id = p.accountId

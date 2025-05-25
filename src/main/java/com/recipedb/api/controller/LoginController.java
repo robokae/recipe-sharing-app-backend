@@ -1,7 +1,7 @@
 package com.recipedb.api.controller;
 
 import com.recipedb.api.dto.LoginRequest;
-import com.recipedb.api.model.ProfileSummary;
+import com.recipedb.api.dto.ProfileResponse;
 import com.recipedb.api.service.LoginService;
 import com.recipedb.api.service.ProfileService;
 import com.recipedb.api.util.JwtTokenUtil;
@@ -28,7 +28,7 @@ public class LoginController {
     private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping(value = "/login", produces = "application/json")
-    public ResponseEntity<ProfileSummary> login(@RequestBody LoginRequest loginDetails) {
+    public ResponseEntity<ProfileResponse> login(@RequestBody LoginRequest loginDetails) {
         UserDetails userDetails = loginService.login(loginDetails);
         String jwtToken = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok()

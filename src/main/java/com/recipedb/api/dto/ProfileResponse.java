@@ -14,5 +14,5 @@ public class ProfileResponse {
     private String lastName;
     private String email;
     private String description;
-    private Date createdAt;
+    private Date joinDate;
 }

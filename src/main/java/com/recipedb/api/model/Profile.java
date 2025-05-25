@@ -1,10 +1,11 @@
 package com.recipedb.api.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 import java.util.Date;
 
@@ -12,10 +13,10 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Profile {
 
     @Id
-    private String id;
     private String accountId;
     private String firstName;
     private String lastName;
